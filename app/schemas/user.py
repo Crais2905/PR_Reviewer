@@ -11,6 +11,10 @@ class UserCreate(UserBase):
     password: str
 
 
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
 class UserPublic(UserBase):
     id: int
     is_active: bool

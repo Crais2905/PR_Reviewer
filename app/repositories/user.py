@@ -18,7 +18,7 @@ class UserRepo(Connector):
             self, data,
             session: AsyncSession,
             commit: bool = True
-    ):
+    ) -> User:
         hashed_password = password_context.hash(data.password)
 
         db_user = User(
@@ -40,6 +40,6 @@ class UserRepo(Connector):
             self,
             user_email: str,
             session: AsyncSession,
-    ):
+    ) -> User:
         stmt = select(self.model).where(self.model.email == user_email)
         return await session.scalar(stmt)

@@ -1,7 +1,7 @@
 from  fastapi import Request, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.services.user import UserService
+from app.services.user import UserService, get_user_service
 from app.db.session import get_session
 from app.auth.tokens import decode_token
 from app.schemas.user import UserPublic
@@ -10,8 +10,8 @@ from app.schemas.user import UserPublic
 async def get_current_user(
     request: Request,
     session: AsyncSession = Depends(get_session),
-    user_service: UserService = Depends(UserService),
-):
+    user_service: UserService = Depends(get_user_service),
+) -> UserPublic:
     try:
         token = request.cookies.get("access_token")
         payload = decode_token(token)
