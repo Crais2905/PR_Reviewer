@@ -22,10 +22,13 @@ class Connector:
         result = await session.execute(stmt)
 
         obj = result.scalar()
+
+        await session.flush()
+
         if commit:
             await session.commit()
-            await session.refresh(obj)
 
+        await session.refresh(obj)
         return obj
 
     async def get_objects(
