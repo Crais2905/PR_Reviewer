@@ -1,4 +1,6 @@
-from fastapi import APIRouter, status, Depends, Response
+from typing import Annotated
+
+from fastapi import APIRouter, status, Depends, Response, Cookie
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user
@@ -24,9 +26,10 @@ async def login_user(
     user_data: UserLogin,
     response: Response,
     user_service: UserService = Depends(get_user_service),
-    session: AsyncSession = Depends(get_session)
+    session: AsyncSession = Depends(get_session),
+    access_token: Annotated[str | None, Cookie()] = None
 ):
-    return await user_service.login_user(user_data, response, session)
+    return await user_service.login_user(user_data, response, access_token, session)
 
 
 @router.post("/logout/", status_code=status.HTTP_204_NO_CONTENT)

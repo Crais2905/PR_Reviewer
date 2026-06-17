@@ -1,4 +1,6 @@
-from fastapi import HTTPException, status, Depends, Response
+from typing import Annotated
+
+from fastapi import HTTPException, status, Depends, Response, Cookie
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.tokens import create_access_token
@@ -33,8 +35,13 @@ class UserService():
             self,
             user_data: UserLogin,
             response: Response,
-            session
+            access_token: Annotated[str | None, Cookie()],
+            session: AsyncSession
     ):
+        print(access_token)
+        if access_token:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are already logged in")
+
         user = await self.user_repository.get_user_by_email(user_data.email, session)
 
         if (not user) or (not self.verify_password(user_data.password, user.hashed_password)):
