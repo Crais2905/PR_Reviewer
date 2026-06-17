@@ -4,6 +4,7 @@ from app.db.session import engine
 from app.db.models import Base
 
 from app.routes.user import router as user_router
+from app.routes.review import router as review_router
 
 app = FastAPI()
 
@@ -15,3 +16,4 @@ async def on_startup():
 
 
 app.include_router(user_router, prefix="/auth", tags=["Auth"])
+app.include_router(review_router, prefix="/reviews", tags=["Review"])

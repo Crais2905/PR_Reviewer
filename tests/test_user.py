@@ -10,7 +10,8 @@ async def user_factory(client: AsyncClient):
             lastname: str = "User",
             email: str = "testuser@gmail.com",
             password: str = "testpassword",
-            get_email: bool = False
+            get_email: bool = False,
+            get_id: bool = False
     ):
         response = await client.post(
             "/auth/register/",
@@ -23,9 +24,13 @@ async def user_factory(client: AsyncClient):
         )
         assert response.status_code == 201
 
-        if get_email:
-            response = await client.get("/auth/me/")
-            return response.json()["email"]
+        if get_email or get_id:
+
+            if get_email:
+                return response.json()["email"]
+            else:
+                id = response.json()["id"]
+                return id
         return
     return _create
 
