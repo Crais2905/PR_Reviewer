@@ -8,7 +8,7 @@ from app.main import app
 from app.db.models import Base, User
 from app.db.session import get_session
 
-engine = create_async_engine(config("DATABASE_URL"), future=True)
+engine = create_async_engine(config("DATABASE_TEST_URL"), future=True)
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)

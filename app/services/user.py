@@ -38,9 +38,8 @@ class UserService():
             access_token: Annotated[str | None, Cookie()],
             session: AsyncSession
     ):
-        print(access_token)
-        if access_token:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are already logged in")
+        # if access_token:
+        #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are already logged in")
 
         user = await self.user_repository.get_user_by_email(user_data.email, session)
 

@@ -19,7 +19,6 @@ class UserRepo(Connector):
             session: AsyncSession,
             commit: bool = True
     ) -> User:
-        print(data.password)
         hashed_password = password_context.hash(data.password)
 
         db_user = User(
