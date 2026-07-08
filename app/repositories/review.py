@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai.schemas import ReviewResponse
 from app.repositories.connector import Connector
 from app.db.models import Review
 from app.enums.review_status import ReviewStatus
@@ -33,5 +34,16 @@ class ReviewRepo(Connector):
             session: AsyncSession
     ):
         review.status = new_status.value
+        await session.commit()
+        await session.refresh(review)
+
+    @staticmethod
+    async def add_analys(review: Review, ai_response: ReviewResponse, session: AsyncSession):
+        data = ai_response.model_dump()
+        print(data)
+        review.summary = data["summary"]
+        review.overall_comment = data["overall_comment"]
+        review.risk = data["risk"].value
+
         await session.commit()
         await session.refresh(review)

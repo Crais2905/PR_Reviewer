@@ -1,4 +1,5 @@
 import datetime
+from typing import Optional
 
 from sqlalchemy import Integer, String, Boolean, DateTime, ForeignKey, Text
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column, relationship
@@ -28,6 +29,9 @@ class Review(Base):
     title: Mapped[str] = mapped_column(String(512), nullable=False)
     diff: Mapped[str] = mapped_column(Text, nullable=False)
     status: Mapped[str] = mapped_column(String, default=ReviewStatus.pending.value)
+    summary: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    overall_comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    risk: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('user.id'))
     user: Mapped[User] = relationship("User", back_populates="reviews", lazy="selectin")
     create_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.datetime.now)

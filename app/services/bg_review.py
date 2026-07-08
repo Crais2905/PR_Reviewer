@@ -1,19 +1,17 @@
-import asyncio
-
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.db.session import AsyncCelerySession
 from app.repositories.review import ReviewRepo
 from app.db.models import Review
 from app.enums.review_status import ReviewStatus
+from app.ai.service import AIAnalysisService, ReviewResponse
 
 
 class BGReviewService:
-    def __init__(self, review_repository: ReviewRepo):
+    def __init__(self, review_repository: ReviewRepo, ai_service: AIAnalysisService):
         self.review_repository = review_repository
+        self.ai_service = ai_service
 
-    async def ai_analys(self, review: Review):
-        await asyncio.sleep(20)
+    async def ai_analys(self, review_diff: str) -> ReviewResponse:
+        return await self.ai_service.get_review(review_diff)
 
     async def review_process(self, review_id: int):
         async with AsyncCelerySession() as session:
@@ -27,11 +25,18 @@ class BGReviewService:
                 return
 
             try:
-                await self.ai_analys(review)
+                response = await self.ai_analys(review.diff)
                 await self.review_repository.change_review_status(
                     review,
                     ReviewStatus.completed,
                     session
                 )
+                await self.review_repository.add_analys(review, response, session)
+
             except Exception as e:
                 print(f"[ERROR]: {e}")
+                await self.review_repository.change_review_status(
+                    review,
+                    ReviewStatus.failed,
+                    session
+                )
