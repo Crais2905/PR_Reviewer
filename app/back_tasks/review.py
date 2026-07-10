@@ -5,11 +5,17 @@ from app.celery_app import celery
 from app.ai.client import get_gemini_model
 from app.repositories.review import ReviewRepo
 from app.services.bg_review import BGReviewService
+from app.services.git_hub import GitParser
 
 
 @celery.task(name="app.back_tasks.review.create_review_task")
 def create_review_task(
         review_id: int
 ):
-    service = BGReviewService(ReviewRepo(), AIAnalysisService(client=get_gemini_model()))
+    service = BGReviewService(
+        ReviewRepo(),
+        AIAnalysisService(client=get_gemini_model()),
+        GitParser()
+    )
+
     async_to_sync(service.review_process)(review_id)

@@ -40,10 +40,16 @@ class ReviewRepo(Connector):
     @staticmethod
     async def add_analys(review: Review, ai_response: ReviewResponse, session: AsyncSession):
         data = ai_response.model_dump()
-        print(data)
         review.summary = data["summary"]
         review.overall_comment = data["overall_comment"]
         review.risk = data["risk"].value
+
+        await session.commit()
+        await session.refresh(review)
+
+    @staticmethod
+    async def set_diff(review: Review, diff: str, session: AsyncSession):
+        review.diff = diff
 
         await session.commit()
         await session.refresh(review)

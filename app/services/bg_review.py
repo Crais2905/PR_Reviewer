@@ -3,12 +3,18 @@ from app.repositories.review import ReviewRepo
 from app.db.models import Review
 from app.enums.review_status import ReviewStatus
 from app.ai.service import AIAnalysisService, ReviewResponse
-
+from app.services.git_hub import GitParser
 
 class BGReviewService:
-    def __init__(self, review_repository: ReviewRepo, ai_service: AIAnalysisService):
+    def __init__(
+            self,
+            review_repository: ReviewRepo,
+            ai_service: AIAnalysisService,
+            git_service: GitParser
+    ):
         self.review_repository = review_repository
         self.ai_service = ai_service
+        self.git_parser = git_service
 
     async def ai_analys(self, review_diff: str) -> ReviewResponse:
         return await self.ai_service.get_review(review_diff)
@@ -25,6 +31,9 @@ class BGReviewService:
                 return
 
             try:
+                pr_diff = await self.git_parser.get_pr_diff(review.pr_url)
+                await self.review_repository.set_diff(review, pr_diff, session)
+
                 response = await self.ai_analys(review.diff)
                 await self.review_repository.change_review_status(
                     review,

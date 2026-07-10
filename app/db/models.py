@@ -27,7 +27,8 @@ class Review(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     title: Mapped[str] = mapped_column(String(512), nullable=False)
-    diff: Mapped[str] = mapped_column(Text, nullable=False)
+    diff: Mapped[str] = mapped_column(Text, nullable=True)
+    pr_url: Mapped[str] = mapped_column(String, nullable=True)
     status: Mapped[str] = mapped_column(String, default=ReviewStatus.pending.value)
     summary: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     overall_comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)

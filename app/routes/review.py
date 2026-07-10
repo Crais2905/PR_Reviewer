@@ -8,7 +8,6 @@ from app.services.review import ReviewService, get_review_service
 from app.schemas.review import ReviewCreate, ReviewPublic, TaskStatusPublic
 from app.db.session import get_session
 from app.db.models import User
-from app.back_tasks.review import create_review_task
 
 
 router = APIRouter()
@@ -16,12 +15,12 @@ router = APIRouter()
 
 @router.post("/", status_code=status.HTTP_202_ACCEPTED, response_model=ReviewPublic)
 async def create_review(
-    review_data: ReviewCreate,
+    pr_data: ReviewCreate,
     review_service: ReviewService = Depends(get_review_service),
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user)
 ):
-    return await review_service.create_review(review_data, current_user.id, session)
+    return await review_service.create_review(pr_data, current_user.id, session)
 
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=List[ReviewPublic])

@@ -8,7 +8,7 @@ from app.enums.review_status import ReviewStatus
 
 class ReviewBase(BaseModel):
     title: str
-    diff: str
+    pr_url: str
 
 
 class ReviewCreate(ReviewBase):
