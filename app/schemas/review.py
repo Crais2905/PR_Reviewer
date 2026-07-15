@@ -1,10 +1,10 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel, ConfigDict
 
 from app.enums.review_status import ReviewStatus
-
+from app.ai.schemas import ProblemsResponse
 
 class ReviewBase(BaseModel):
     title: str
@@ -26,10 +26,5 @@ class ReviewPublic(ReviewBase):
     summary: Optional[str] = None
     overall_comment: Optional[str] = None
     risk: Optional[str] = None
+    problems: List[ProblemsResponse]
     create_at: datetime
-
-
-class TaskStatusPublic(BaseModel):
-    task_id: str
-    status: str
-    result: ReviewPublic | None = None

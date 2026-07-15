@@ -44,6 +44,7 @@ class ReviewRepo(Connector):
         review.overall_comment = data["overall_comment"]
         review.risk = data["risk"].value
 
+
         await session.commit()
         await session.refresh(review)
 

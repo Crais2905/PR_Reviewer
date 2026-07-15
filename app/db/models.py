@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional
+from typing import Optional, List
 
 from sqlalchemy import Integer, String, Boolean, DateTime, ForeignKey, Text
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column, relationship
@@ -35,4 +35,18 @@ class Review(Base):
     risk: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('user.id'))
     user: Mapped[User] = relationship("User", back_populates="reviews", lazy="selectin")
+    problems: Mapped[List["ReviewProblems"]] = relationship("ReviewProblems", back_populates="review", lazy="selectin")
     create_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.datetime.now)
+
+
+class ReviewProblems(Base):
+    __tablename__ = "review_problems"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    review_id: Mapped[int] = mapped_column(Integer, ForeignKey("review.id"))
+    review: Mapped[Review] = relationship("Review", back_populates="problems", lazy="selectin")
+    title: Mapped[str] = mapped_column(String(512), nullable=False)
+    severity: Mapped[str] = mapped_column(String(512), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    recommendation: Mapped[str] = mapped_column(Text, nullable=False)
+    category: Mapped[str] = mapped_column(String(64), nullable=False)

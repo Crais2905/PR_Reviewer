@@ -6,6 +6,7 @@ from app.ai.client import get_gemini_model
 from app.repositories.review import ReviewRepo
 from app.services.bg_review import BGReviewService
 from app.services.git_hub import GitParser
+from app.repositories.problems import ProblemsRepo
 
 
 @celery.task(name="app.back_tasks.review.create_review_task")
@@ -14,6 +15,7 @@ def create_review_task(
 ):
     service = BGReviewService(
         ReviewRepo(),
+        ProblemsRepo(),
         AIAnalysisService(client=get_gemini_model()),
         GitParser()
     )

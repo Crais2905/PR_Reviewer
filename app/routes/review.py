@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user
 from app.services.review import ReviewService, get_review_service
-from app.schemas.review import ReviewCreate, ReviewPublic, TaskStatusPublic
+from app.schemas.review import ReviewCreate, ReviewPublic
 from app.db.session import get_session
 from app.db.models import User
 
