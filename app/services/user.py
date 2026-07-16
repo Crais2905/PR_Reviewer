@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import HTTPException, status, Depends, Response, Cookie
 from sqlalchemy.ext.asyncio import AsyncSession
+from decouple import config
 
 from app.auth.tokens import create_access_token
 from app.repositories.user import UserRepo, password_context
@@ -38,8 +39,8 @@ class UserService():
             access_token: Annotated[str | None, Cookie()],
             session: AsyncSession
     ):
-        # if access_token:
-        #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are already logged in")
+        if access_token:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are already logged in")
 
         user = await self.user_repository.get_user_by_email(user_data.email, session)
 
@@ -47,7 +48,9 @@ class UserService():
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
         access_token = create_access_token({"sub": user.email})
-        response.set_cookie("access_token", access_token)
+        life_time = config("ACCESS_TOKEN_EXPIRE_MINUTES") * 60
+
+        response.set_cookie("access_token", access_token, max_age=life_time)
 
         return {
             "access_token": access_token
