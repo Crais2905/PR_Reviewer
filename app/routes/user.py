@@ -45,3 +45,13 @@ async def profile_user(
     current_user: UserPublic = Depends(get_current_user)
 ):
     return current_user
+
+
+@router.post("/refresh/", status_code=status.HTTP_200_OK)
+async def refresh(
+    response: Response,
+    user_service: UserService = Depends(get_user_service),
+    refresh_token: Annotated[str | None, Cookie()] = None,
+    session: AsyncSession = Depends(get_session)
+):
+    return await user_service.refresh(response, refresh_token, session)
