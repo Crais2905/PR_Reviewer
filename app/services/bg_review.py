@@ -6,6 +6,7 @@ from app.ai.service import AIAnalysisService, ReviewResponse
 from app.services.git_hub import GitParser
 from app.repositories.problems import ProblemsRepo
 
+
 class BGReviewService:
     def __init__(
             self,
@@ -33,25 +34,25 @@ class BGReviewService:
             if review is None:
                 return
 
-            # try:
-            pr_diff = await self.git_parser.get_pr_diff(review.pr_url)
-            await self.review_repository.set_diff(review, pr_diff, session)
+            try:
+                pr_diff = await self.git_parser.get_pr_diff(review.pr_url)
+                await self.review_repository.set_diff(review, pr_diff, session)
 
-            response = await self.ai_analys(review.diff)
-            print(response.json())
-            await self.review_repository.change_review_status(
-                review,
-                ReviewStatus.completed,
-                session
-            )
+                response = await self.ai_analys(review.diff)
 
-            await self.problems_repository.bulk_create_problems(response.finding_problems, review.id, session)
-            await self.review_repository.add_analys(review, response, session)
+                await self.review_repository.change_review_status(
+                    review,
+                    ReviewStatus.completed,
+                    session
+                )
 
-            # except Exception as e:
-            #     print(f"[ERROR]: {e}")
-            #     await self.review_repository.change_review_status(
-            #         review,
-            #         ReviewStatus.failed,
-            #         session
-            #     )
+                await self.problems_repository.bulk_create_problems(response.finding_problems, review.id, session)
+                await self.review_repository.add_analys(review, response, session)
+
+            except Exception as e:
+                print(f"[ERROR]: {e}")
+                await self.review_repository.change_review_status(
+                    review,
+                    ReviewStatus.failed,
+                    session
+                )
