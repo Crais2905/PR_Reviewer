@@ -17,10 +17,10 @@ class UserService():
     def verify_password(password: str, hashed_password: str) -> bool:
         return password_context.verify(password, hashed_password)
 
-    async def get_user(self, email: str, session: AsyncSession):
+    async def get_user(self, email: str, session: AsyncSession) -> User:
         return await self.user_repository.get_user_by_email(email, session)
 
-    async def create_user(self, user_data: UserCreate, session: AsyncSession):
+    async def create_user(self, user_data: UserCreate, session: AsyncSession) -> User:
         existing_user = await self.user_repository.get_user_by_email(user_data.email, session)
 
         if existing_user:
@@ -46,7 +46,7 @@ class UserService():
             response: Response,
             access_token: Annotated[str | None, Cookie()],
             session: AsyncSession
-    ):
+    ) -> dict:
         if access_token:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are already logged in")
 
@@ -60,7 +60,7 @@ class UserService():
         }
 
     @staticmethod
-    async def logout_user(response: Response):
+    async def logout_user(response: Response) -> dict:
         response.delete_cookie("access_token")
         return {"Log out": "successful"}
 
@@ -69,7 +69,7 @@ class UserService():
         response: Response,
         refresh_token: Annotated[str | None, Cookie()],
         session: AsyncSession
-    ):
+    ) -> dict:
         if not refresh_token:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Can't get a refresh token")
 
@@ -90,7 +90,7 @@ class UserService():
         return await self.set_access_token(user, response)
 
     @staticmethod
-    async def set_access_token(user: User, response: Response):
+    async def set_access_token(user: User, response: Response) -> dict:
         access_token = create_access_token({"sub": user.email})
         life_time = config("ACCESS_TOKEN_EXPIRE_MINUTES") * 60
 
@@ -100,7 +100,7 @@ class UserService():
         }
 
     @staticmethod
-    async def set_refresh_token(user: User, response: Response):
+    async def set_refresh_token(user: User, response: Response) -> dict:
         refresh_token = create_refresh_token({"sub": user.email})
         life_time = config("ACCESS_TOKEN_EXPIRE_MINUTES") * 60
 

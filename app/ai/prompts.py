@@ -13,5 +13,5 @@ class AIPrompts(Enum):
         My git difference: {diff}
     """
 
-    def render(self, **kwargs):
+    def render(self, **kwargs) -> str:
         return self.value.format(**kwargs)

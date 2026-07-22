@@ -7,7 +7,7 @@ from app.enums.review_status import ReviewStatus
 
 class BGReviewRepo:
     @staticmethod
-    def get_review_by_id(review_id: int, session: Session):
+    def get_review_by_id(review_id: int, session: Session) -> Review:
         stmt = (
             select(Review)
             .options(noload(Review.user))
@@ -16,6 +16,6 @@ class BGReviewRepo:
         return session.scalar(stmt)
 
     @staticmethod
-    def change_review_status(review: Review, new_status: ReviewStatus,  session: Session):
+    def change_review_status(review: Review, new_status: ReviewStatus,  session: Session) -> None:
         review.status = new_status.value
         session.commit()

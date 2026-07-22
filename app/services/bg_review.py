@@ -23,7 +23,7 @@ class BGReviewService:
     async def ai_analys(self, review_diff: str) -> ReviewResponse:
         return await self.ai_service.get_review(review_diff)
 
-    async def review_process(self, review_id: int):
+    async def review_process(self, review_id: int) -> None:
         async with AsyncCelerySession() as session:
             review = await self.review_repository.get_object_by_unic_field(
                 review_id,

@@ -1,12 +1,13 @@
-from fastapi import Depends
-
-from decouple import config
-from typing import Any, List
+from typing import TypeVar, Sequence
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import insert, delete, update
 from sqlalchemy.orm import selectinload, InstrumentedAttribute
+
+from app.db.models import Base
+
+ModelType = TypeVar("ModelType", bound=Base)
 
 
 class Connector:
@@ -17,7 +18,7 @@ class Connector:
         self, data,
         session: AsyncSession,
         commit: bool = True
-    ):
+    ) -> ModelType:
         stmt = insert(self.model).values(data.model_dump()).returning(self.model)
         result = await session.execute(stmt)
 
@@ -37,21 +38,22 @@ class Connector:
             offset: int = 0,
             limit: int = 10,
             filters: list | None = None,
-    ):
+    ) -> Sequence[ModelType]:
         stmt = select(self.model)
 
         if filters:
             stmt = stmt.where(*filters)
 
         stmt = stmt.offset(offset).limit(limit)
-        return await session.scalars(stmt)
+        result = await session.scalars(stmt)
+        return result.all()
 
     async def get_object_by_unic_field(
         self, field_value,
         field: InstrumentedAttribute,
         session: AsyncSession,
         selection_fields: list[InstrumentedAttribute] | None = None
-    ):
+    ) -> ModelType:
         stmt = select(self.model).where(field == field_value)
 
         if selection_fields is not None:

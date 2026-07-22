@@ -29,7 +29,7 @@ class GitParser:
         owner, repo, number = match.groups()
         return f"https://api.github.com/repos/{owner}/{repo}/pulls/{number}"
 
-    async def get_pr_diff(self, pr_url: str):
+    async def get_pr_diff(self, pr_url: str) -> str:
         url = self._html_pr_url_to_api(pr_url)
 
         async with httpx.AsyncClient() as client:

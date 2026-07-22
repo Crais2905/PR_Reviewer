@@ -1,3 +1,5 @@
+import types
+
 from fastapi import Depends
 
 from app.ai.client import get_gemini_model, Client
