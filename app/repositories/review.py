@@ -5,6 +5,7 @@ from app.ai.schemas import ReviewResponse
 from app.repositories.connector import Connector
 from app.db.models import Review
 from app.enums.review_status import ReviewStatus
+from app.schemas.review import ReviewFilterParams
 
 
 class ReviewRepo(Connector):
@@ -14,17 +15,15 @@ class ReviewRepo(Connector):
     async def get_user_reviews(
             self,
             user_id: int,
+            filters_query: ReviewFilterParams,
             session: AsyncSession,
-            offset: int = 0,
-            limit: int = 10,
-            filters: list | None = None,
     ):
-        stmt = select(self.model).where(self.model.user_id == user_id)
+        stmt = (select(self.model).where(self.model.user_id == user_id))
 
-        if filters:
-            stmt = stmt.where(*filters)
+        if filters_query.order_by_created_time:
+            stmt = stmt.order_by(self.model.create_at.desc())
 
-        stmt = stmt.offset(offset).limit(limit)
+        stmt = stmt.offset(filters_query.offset).limit(filters_query.limit)
         return await session.scalars(stmt)
 
     @staticmethod

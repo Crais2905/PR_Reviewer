@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 
 from app.repositories.review import ReviewRepo
-from app.schemas.review import ReviewCreate, ReviewCreateDB
+from app.schemas.review import ReviewCreate, ReviewCreateDB, ReviewFilterParams
 from app.db.models import Review
 from app.back_tasks.review import create_review_task
 from app.enums.review_status import ReviewStatus
@@ -23,8 +23,8 @@ class ReviewService:
 
         return review
 
-    async def get_reviews(self, user_id: int, session: AsyncSession):
-        return await self.review_repository.get_user_reviews(user_id, session)
+    async def   get_reviews(self, user_id: int, filter_query: ReviewFilterParams, session: AsyncSession):
+        return await self.review_repository.get_user_reviews(user_id, filter_query, session)
 
     async def get_review(self, review_id: int, user_id: int, session: AsyncSession):
         review = await self.review_repository.get_object_by_unic_field(review_id, Review.id, session)

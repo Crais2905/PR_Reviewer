@@ -1,11 +1,11 @@
-from typing import List
+from typing import List, Annotated
 
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user
 from app.services.review import ReviewService, get_review_service
-from app.schemas.review import ReviewCreate, ReviewPublic
+from app.schemas.review import ReviewCreate, ReviewPublic, ReviewFilterParams
 from app.db.session import get_session
 from app.db.models import User
 
@@ -25,11 +25,12 @@ async def create_review(
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=List[ReviewPublic])
 async def get_reviews(
+    filter_query: Annotated[ReviewFilterParams, Query()],
     review_service: ReviewService = Depends(get_review_service),
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
-    return await review_service.get_reviews(current_user.id, session)
+    return await review_service.get_reviews(current_user.id, filter_query, session)
 
 
 @router.get("/{review_id}", status_code=status.HTTP_200_OK, response_model=ReviewPublic)
